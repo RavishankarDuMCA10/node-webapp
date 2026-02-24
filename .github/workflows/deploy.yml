@@ -76,7 +76,7 @@ jobs:
           run: |
             az webapp deployment slot swap \
               --name scalable-webapp-prod-6789 \
-              --resource-group <YOUR_RESOURCE_GROUP> \
+              --resource-group rg-scalable-webapp \
               --slot staging \
               --target-slot production
   
