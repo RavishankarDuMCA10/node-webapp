@@ -69,7 +69,7 @@ jobs:
           run: |
             echo "Waiting for staging warmup..."
             sleep 40
-            curl -f https://scalable-webapp-prod-6789-staging.azurewebsites.net/health
+            curl -f https://scalable-webapp-prod-67-staging-fmdvd2h2hjcmb9gt.centralindia-01.azurewebsites.net/health
   
         # ✅ STEP 3 — BLUE-GREEN SWAP
         - name: Swap Staging to Production
