@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: webapp-scalable-ecommerce-1234
-  NODE_VERSION: '18.x'
+  AZURE_WEBAPP_NAME: scalable-webapp
+  NODE_VERSION: '22.x'
 
 jobs:
   build-and-deploy:
