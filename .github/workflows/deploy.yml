@@ -1,53 +1,65 @@
-name: Build and Deploy Node.js to Azure Web App
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - scalable-webapp-prod-6789
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_NAME: scalable-webapp-prod-6789
-  NODE_VERSION: '22.x'
-
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     permissions:
-      id-token: write   # REQUIRED for OIDC
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
 
-    - name: Install dependencies
-      run: npm install
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
 
-    - name: Build
-      run: npm run build --if-present
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: .
 
-    - name: Run tests
-      run: npm test --if-present
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
-    # ✅ REQUIRED LOGIN STEP
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_BA6A566972EE4B749591D0369D2D60F5 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_067935D58E014875B93C94CF1816AC2E }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5F693A04767946C3AE0B69B6B03446ED }}
 
-    # ✅ DEPLOY AFTER LOGIN
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        resource-group-name: rg-scalable-webapp
-        package: .
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'scalable-webapp-prod-6789'
+          slot-name: 'Production'
+          package: .
+          
