@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: scalable-webapp
+  AZURE_WEBAPP_NAME: scalable-webapp-prod-6789
   NODE_VERSION: '22.x'
 
 jobs:
